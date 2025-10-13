@@ -48,7 +48,6 @@ loadContent("home.html");
 const output = document.querySelector("#main-content");
 const links = document.querySelectorAll("nav a");
 
-// ---------------- Navigation ----------------
 for (let link of links) {
   link.addEventListener("click", function (event) {
     event.preventDefault();
@@ -59,7 +58,6 @@ for (let link of links) {
   });
 }
 
-// ---------------- Load Content ----------------
 function loadContent(url) {
   const xhr = new XMLHttpRequest();
   xhr.open("GET", url);
@@ -70,10 +68,13 @@ function loadContent(url) {
       if (newMain) {
         output.replaceChildren(...newMain.childNodes);
 
-        // Wenn Teile-Seite geladen -> JSON-Daten laden
         if (url.includes("parts.html")) {
           loadParts();
-        }
+        } else if (url.includes("cart.html")) {
+  // kleine Verzögerung / sicherstellen, dass DOM eingefügt ist
+  setTimeout(renderCart, 0);
+}
+
       } else {
         output.textContent = "Keine <main>-Inhalte gefunden!";
       }
@@ -84,7 +85,6 @@ function loadContent(url) {
   xhr.send();
 }
 
-// ---------------- Load Parts ----------------
 function loadParts() {
   const xhr = new XMLHttpRequest();
   xhr.open("GET", "data/parts.json");
@@ -104,6 +104,21 @@ function loadParts() {
           <p>${part.price} €</p>
           <button data-id="${part.id}">Hinzufügen</button>
         `;
+
+        const button = card.querySelector("button");
+  button.addEventListener("click", function() {
+    const cart = getCart();
+    // prüfen, ob Teil schon vorhanden
+    if (!cart.find(item => item.id === part.id)) {
+      cart.push(part);
+      saveCart(cart);
+      updateCartCount();
+      alert(`${part.name} wurde hinzugefügt!`);
+    } else {
+      alert(`${part.name} ist schon im Warenkorb.`);
+    }
+  });
+
         container.appendChild(card);
       });
     } else {
@@ -113,14 +128,134 @@ function loadParts() {
   xhr.send();
 }
 
-// ---------------- Back-Button ----------------
+function getCart() {
+  return JSON.parse(localStorage.getItem("cart")) || [];
+}
+
+function saveCart(cart) {
+  localStorage.setItem("cart", JSON.stringify(cart));
+}
+
+function updateCartCount() {
+  const cart = getCart();
+const countEl = document.querySelector("#cart-count");
+  if (countEl) countEl.textContent = cart.length;
+}
+
+function renderCart() {
+  const cart = getCart();
+  const list = document.querySelector("#cart-list");
+  const totalEl = document.querySelector("#cart-total");
+  const clearBtn = document.querySelector("#clear-cart");
+  const checkoutBtn = document.querySelector("#checkout");
+
+  if (!list || !totalEl) return; 
+
+ 
+  list.innerHTML = "";
+
+  // 2) Wenn leer -> Hinweis anzeigen
+  if (cart.length === 0) {
+    const p = document.createElement("p");
+    p.textContent = "Dein Warenkorb ist leer.";
+    list.appendChild(p);
+    totalEl.textContent = "Gesamt: 0 €";
+    // Buttons deaktivieren
+    clearBtn.disabled = true;
+    checkoutBtn.disabled = true;
+    return;
+  }
+
+  // 3) Sonst: Artikel einfügen und Summe berechnen
+  let total = 0;
+  cart.forEach(item => {
+    total += Number(item.price);
+
+    const li = document.createElement("li");
+    li.classList.add("cart-item");
+    li.dataset.id = item.id; // id im DOM merken
+
+    // Baue sauberes DOM (kein innerHTML nötig, aber übersichtlicher)
+    const img = document.createElement("img");
+    img.src = item.img;
+    img.alt = item.name;
+    img.style.width = "60px";
+    img.style.height = "60px";
+    img.style.objectFit = "cover";
+    img.style.marginRight = "0.5rem";
+
+    const info = document.createElement("div");
+    info.style.display = "inline-block";
+    info.style.verticalAlign = "top";
+
+    const name = document.createElement("div");
+    name.textContent = item.name;
+
+    const price = document.createElement("div");
+    price.textContent = item.price + " €";
+
+    info.appendChild(name);
+    info.appendChild(price);
+
+    const removeBtn = document.createElement("button");
+    removeBtn.textContent = "Entfernen";
+    removeBtn.style.marginLeft = "1rem";
+    removeBtn.addEventListener("click", function() {
+      removeFromCart(item.id);
+    });
+
+    li.appendChild(img);
+    li.appendChild(info);
+    li.appendChild(removeBtn);
+
+    list.appendChild(li);
+  });
+
+  totalEl.textContent = "Gesamt: " + total + " €";
+
+  // Buttons aktivieren
+  clearBtn.disabled = false;
+  checkoutBtn.disabled = false;
+}
+
+// --- Entfernt ein Item nach ID ---
+function removeFromCart(id) {
+  let cart = getCart();
+  cart = cart.filter(item => item.id !== id);
+  saveCart(cart);
+  updateCartCount();
+
+  // Wenn wir gerade auf der cart.html sind: neu rendern
+  const list = document.querySelector("#cart-list");
+  if (list) renderCart();
+}
+
+// --- Alles entfernen ---
+function clearCart() {
+  localStorage.removeItem("cart");
+  updateCartCount();
+  const list = document.querySelector("#cart-list");
+  if (list) renderCart();
+}
+
+// --- Checkout Simulation ---
+function checkout() {
+  // einfache Demo: clear cart + Meldung
+  alert("Vielen Dank für deinen Einkauf! (Dies ist nur ein Demo-Checkout.)");
+  clearCart();
+  // optional: redirect to confirmation page
+}
+
+
+
 window.addEventListener("popstate", function(event) {
-  if (event.state) {
+  if (event.state) { //aus push state
     loadContent(event.state.page);
   } else {
     loadContent("home.html");
   }
 });
 
-// ---------------- Startinhalt ----------------
-loadContent("home.html");
+loadContent("home.html");//mein Anfang starten
+updateCartCount();
+renderCart();
