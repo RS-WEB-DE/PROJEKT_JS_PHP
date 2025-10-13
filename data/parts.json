@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "name": "Uhrwerk ETA 2824-2",
+    "price": 199,
+    "img": "img/movement.jpg"
+  },
+  {
+    "id": 2,
+    "name": "Zifferblatt Weiß 40mm",
+    "price": 49,
+    "img": "img/dial.jpg"
+  },
+  {
+    "id": 3,
+    "name": "Zeigersatz Blau",
+    "price": 29,
+    "img": "img/hands.jpg"
+  }
+]
