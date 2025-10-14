@@ -11,10 +11,12 @@ for (let link of links) {
     const href = this.getAttribute("href"); // z. B. "parts.html"
     loadContent(href);
 
-    // Verlauf speichern (Back-Button funktioniert)
-    history.pushState({ page: href }, "", href);
+    // history.pushState(stateObject, title, url);
+    history.pushState({ page: href }, "WatchCraft Teile", href);
   });
 }
+
+
 
 
 function loadContent(url) {
@@ -42,6 +44,49 @@ function loadContent(url) {
 
   xhr.send();
 }
+
+/* const footer = document.querySelector("#footerId");
+
+const datenschutz = document.createElement("a");
+datenschutz.textContent = "Datenschutz";
+datenschutz.setAttribute("href", "datenschutz.html");
+
+const impressum = document.createElement("a");
+impressum.textContent = "Impressum";
+impressum.setAttribute("href", "impressum.html");
+
+footer.appendChild(datenschutz);
+footer.appendChild(impressum);
+
+datenschutz.addEventListener("click", handleFooterClick);
+impressum.addEventListener("click", handleFooterClick);
+
+function handleFooterClick(event) {
+  const href = this.getAttribute("href");
+  loadContent(href);
+  history.pushState({ page: href }, "", href);
+}
+ */
+function createFooterLink(text, href) {
+  const link = document.createElement("a");
+  link.textContent = text;
+  link.setAttribute("href", href);
+
+  link.addEventListener("click", function(event) {
+   // event.preventDefault();
+    loadContent(href);
+    history.pushState({ page: href }, "", href);
+  });
+
+  return link;
+}
+
+const footer = document.querySelector("#footerId");
+footer.append(
+  createFooterLink("Datenschutz", "datenschutz.html"),
+  createFooterLink("Impressum", "impressum.html")
+);
+
 
 
 window.addEventListener("popstate", function (event) {

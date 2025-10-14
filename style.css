@@ -121,6 +121,10 @@ main {
   background: #b02a37;
 }
 
+#footerId a {
+  color: #fff;
+}
+
 /* 
 #added-overlay {
   position: fixed;
