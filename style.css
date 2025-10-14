@@ -1,7 +1,10 @@
 body {
   font-family: "Inter", system-ui, sans-serif;
-  background-color: #f8f8f8;
-  color: #222;
+  background-image: url("./img/RS_TIME.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  color: #fff;
   margin: 0;
   display: flex;
   flex-direction: column;

@@ -1,14 +1,10 @@
 "use strict";
 
-// ------------------------------------------------------------
-// 1. Elemente holen
-// ------------------------------------------------------------
+
 const output = document.querySelector("#main-content");
 const links = document.querySelectorAll("nav a");
 
-// ------------------------------------------------------------
-// 2. Navigation: Seiten per AJAX laden
-// ------------------------------------------------------------
+
 for (let link of links) {
   link.addEventListener("click", function (event) {
     event.preventDefault(); // Seite lädt nicht neu
@@ -20,26 +16,24 @@ for (let link of links) {
   });
 }
 
-// ------------------------------------------------------------
-// 3. Funktion: Seite per AJAX laden
-// ------------------------------------------------------------
+
 function loadContent(url) {
   const xhr = new XMLHttpRequest();
   xhr.open("GET", url);
-  xhr.responseType = "document"; // Ganze HTML-Datei als Dokument holen
+  xhr.responseType = "document"; 
 
   xhr.onload = function () {
     if (xhr.status === 200 && xhr.response) {
-      // neues <main> aus der geladenen Datei nehmen
+      
       const newMain = xhr.response.querySelector("main");
-      // altes <main> ersetzen
+     
       output.replaceChildren(...newMain.childNodes);
 
-      // Prüfen, welche Seite geladen wurde
+     
       if (url.includes("parts.html")) {
-        loadParts(); // Produkte anzeigen
+        loadParts(); 
       } else if (url.includes("cart.html")) {
-        setTimeout(renderCart, 0); // Warenkorb anzeigen
+        setTimeout(renderCart, 0); 
       }
     } else {
       output.textContent = "Fehler beim Laden der Seite.";
@@ -49,9 +43,7 @@ function loadContent(url) {
   xhr.send();
 }
 
-// ------------------------------------------------------------
-// 4. Wenn der Benutzer den Zurück-Button klickt
-// ------------------------------------------------------------
+
 window.addEventListener("popstate", function (event) {
   if (event.state) {
     loadContent(event.state.page);
@@ -60,9 +52,7 @@ window.addEventListener("popstate", function (event) {
   }
 });
 
-// ------------------------------------------------------------
-// 5. Produkte laden (parts.json)
-// ------------------------------------------------------------
+
 function loadParts() {
   const xhr = new XMLHttpRequest();
   xhr.open("GET", "data/parts.json");
@@ -72,11 +62,11 @@ function loadParts() {
       const parts = xhr.response;
       const container = document.querySelector("#parts-list");
 
-      // Inhalt leeren
+      
       container.innerHTML = "";
 
       parts.forEach(part => {
-        // Produktkarte
+        
         const card = document.createElement("div");
         card.classList.add("part-card");
         card.innerHTML = `
@@ -86,7 +76,7 @@ function loadParts() {
           <button data-id="${part.id}">Hinzufügen</button>
         `;
 
-        // Klick auf "Hinzufügen"
+        
         const button = card.querySelector("button");
         button.addEventListener("click", function () {
           const cart = getCart();
@@ -111,28 +101,24 @@ function loadParts() {
   xhr.send();
 }
 
-// ------------------------------------------------------------
-// 6. Warenkorb-Funktionen (localStorage)
-// ------------------------------------------------------------
+
 function getCart() {
   return JSON.parse(localStorage.getItem("cart")) || [];
 }
 
 function saveCart(cart) {
-  // speichert Array als Text
+  
   localStorage.setItem("cart", JSON.stringify(cart));
 }
 
 function updateCartCount() {
-  // zeigt Anzahl oben rechts an
+ 
   const cart = getCart();
   const countEl = document.querySelector("#cart-count");
   if (countEl) countEl.textContent = cart.length;
 }
 
-// ------------------------------------------------------------
-// 7. Warenkorb-Seite aufbauen
-// ------------------------------------------------------------
+
 function renderCart() {
   const cart = getCart();
   const list = document.querySelector("#cart-list");
@@ -142,10 +128,10 @@ function renderCart() {
 
   if (!list || !totalEl) return;
 
-  // 1. Alles löschen
+ 
   list.innerHTML = "";
 
-  // 2. Wenn leer
+ 
   if (cart.length === 0) {
     list.innerHTML = "<p>Dein Warenkorb ist leer.</p>";
     totalEl.textContent = "Gesamt: 0 €";
@@ -154,7 +140,7 @@ function renderCart() {
     return;
   }
 
-  // 3. Produkte anzeigen
+
   let total = 0;
   cart.forEach(item => {
     total += Number(item.price);
