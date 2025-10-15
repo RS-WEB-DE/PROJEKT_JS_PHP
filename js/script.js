@@ -7,8 +7,8 @@ const links = document.querySelectorAll("nav a");
 
 for (let link of links) {
   link.addEventListener("click", function (event) {
-    event.preventDefault(); // Seite lädt nicht neu
-    const href = this.getAttribute("href"); // z. B. "parts.html"
+    event.preventDefault(); 
+    const href = this.getAttribute("href"); 
     loadContent(href);
 
     // history.pushState(stateObject, title, url);
@@ -16,6 +16,69 @@ for (let link of links) {
   });
 }
 
+function checkLoginStatus() {
+  const xhr = new XMLHttpRequest();
+  xhr.open("GET", "api/session.php");
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      const res = JSON.parse(xhr.responseText);
+      const header = document.querySelector("header");
+
+      const old = document.querySelector("#login-status");
+      if (old) old.remove();
+
+      const span = document.createElement("span");
+      span.id = "login-status";
+
+      if (res.loggedIn) {
+        span.textContent = `Eingeloggt als ${res.user.username} (${res.user.role}) `;
+        const logoutBtn = document.createElement("button");
+        logoutBtn.textContent = "Logout";
+        logoutBtn.addEventListener("click", logout);
+        span.appendChild(logoutBtn);
+      } else {
+        span.textContent = "Nicht eingeloggt";
+      }
+      header.appendChild(span);
+    }
+  };
+  xhr.send();
+}
+
+function logout() {
+  const xhr = new XMLHttpRequest();
+  xhr.open("GET", "api/logout.php");
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      checkLoginStatus(); 
+    }
+  };
+  xhr.send();
+}
+
+checkLoginStatus(); 
+
+
+document.addEventListener("submit", function(e) {
+  if (e.target.id === "login-form") {
+    e.preventDefault();
+    const username = document.querySelector("#username").value;
+    const password = document.querySelector("#password").value;
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "api/login.php");
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        const res = JSON.parse(xhr.responseText);
+        document.querySelector("#login-msg").textContent = "Willkommen, " + username;
+      } else {
+        document.querySelector("#login-msg").textContent = "Login fehlgeschlagen.";
+      }
+    };
+    xhr.send(JSON.stringify({ username, password }));
+  }
+});
 
 
 
@@ -28,6 +91,10 @@ function loadContent(url) {
     if (xhr.status === 200 && xhr.response) {
       
       const newMain = xhr.response.querySelector("main");
+        if (!newMain) {
+        output.textContent = "Geladene Seite enthält kein <main>.";
+        return;
+      }
      
       output.replaceChildren(...newMain.childNodes);
 
@@ -73,7 +140,8 @@ function createFooterLink(text, href) {
   link.setAttribute("href", href);
 
   link.addEventListener("click", function(event) {
-   // event.preventDefault();
+   event.preventDefault();
+   console.log("Footer-Link geklickt:", href); 
     loadContent(href);
     history.pushState({ page: href }, "", href);
   });
@@ -100,7 +168,7 @@ window.addEventListener("popstate", function (event) {
 
 function loadParts() {
   const xhr = new XMLHttpRequest();
-  xhr.open("GET", "data/parts.json");
+  xhr.open("GET", "api/getParts.php");
   xhr.responseType = "json";
   xhr.onload = function () {
     if (xhr.status === 200) {
