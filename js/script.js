@@ -28,6 +28,10 @@ function loadContent(url) {
     if (xhr.status === 200 && xhr.response) {
       
       const newMain = xhr.response.querySelector("main");
+        if (!newMain) {
+        output.textContent = "Geladene Seite enthält kein <main>.";
+        return;
+      }
      
       output.replaceChildren(...newMain.childNodes);
 
@@ -73,7 +77,8 @@ function createFooterLink(text, href) {
   link.setAttribute("href", href);
 
   link.addEventListener("click", function(event) {
-   // event.preventDefault();
+   event.preventDefault();
+   console.log("Footer-Link geklickt:", href); 
     loadContent(href);
     history.pushState({ page: href }, "", href);
   });

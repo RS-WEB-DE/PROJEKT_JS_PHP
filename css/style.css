@@ -1,6 +1,6 @@
 body {
   font-family: "Inter", system-ui, sans-serif;
-  background-image: url("./img/RS_TIME.jpg");
+  background-image: url("/img/RS_TIME.jpg");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -66,6 +66,7 @@ main {
 
 .part-card h3 {
   margin: 0.5rem 0;
+  color: #111;
 }
 
 .part-card p {
