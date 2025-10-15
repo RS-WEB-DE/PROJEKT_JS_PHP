@@ -18,7 +18,6 @@ try {
 
     echo json_encode($parts, JSON_UNESCAPED_UNICODE);
 } catch (PDOException $e) {
-    // Im Prod niemals voller Fehlertext, hier für Entwicklung nützlich
     http_response_code(500);
     echo json_encode(['error' => 'Datenbankfehler', 'message' => $e->getMessage()]);
 }
