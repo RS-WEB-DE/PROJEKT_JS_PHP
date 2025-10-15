@@ -1,6 +1,10 @@
 body {
   font-family: "Inter", system-ui, sans-serif;
+<<<<<<< HEAD
   background-image: url("RS_TIME.jpg");
+=======
+  background-image: url("/img/RS_TIME.jpg");
+>>>>>>> e99160ae3b058e96909447bcbfdcdc22c30ff5ec
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;

@@ -21,3 +21,6 @@ watchcraft/
 │   └── watchcraft.sql   ← dein Datenbankschema
 └── data/
     └── ...
+
+
+git remote add origin https://github.com/RS-WEB-DE/PROJEKT_JS_PHP.git
